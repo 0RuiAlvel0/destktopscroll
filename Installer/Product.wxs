@@ -82,7 +82,6 @@
     <ComponentGroup Id="DesktopScrollComponents" Directory="INSTALLFOLDER">
       <Component Id="DesktopScrollExeComponent" Guid="{5B9F2E1A-9F82-4C0D-AE8C-7E13A4EC0D88}">
         <File Id="DesktopScrollExe" Source="$(var.DesktopScrollPublishDir)DesktopScroll.exe" />
-        <File Source="$(var.DesktopScrollPublishDir)DesktopScroll.dll" />
         <File Source="$(var.DesktopScrollPublishDir)appsettings.json" />
       </Component>
     </ComponentGroup>
