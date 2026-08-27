@@ -4,6 +4,7 @@ obj/
 artifacts/
 
 ## Visual Studio user-specific files
+.vs/
 *.user
 *.suo
 *.userosscache
@@ -15,6 +16,24 @@ artifacts/
 ## NuGet
 *.nupkg
 *.snupkg
+
+## Local secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+*.publishsettings
+secrets.json
+
+## Local diagnostics and data
+*.log
+TestResults/
+*.db
+*.sqlite
+*.sqlite3
 
 ## OS files
 .DS_Store
