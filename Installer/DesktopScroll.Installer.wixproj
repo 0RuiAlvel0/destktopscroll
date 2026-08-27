@@ -1,0 +1,27 @@
+<Project Sdk="WixToolset.Sdk/7.0.0">
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <OutputName>DesktopScroll</OutputName>
+    <Platform>x64</Platform>
+    <DesktopScrollPublishDir>$(MSBuildProjectDirectory)\..\artifacts\publish\</DesktopScrollPublishDir>
+    <DefineConstants>Version=$(Version);DesktopScrollPublishDir=$(DesktopScrollPublishDir)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DesktopScroll.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="7.0.0" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <BindVariable Include="WixUILicenseRtf=License.rtf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="License.rtf" />
+    <Content Include="Product.wxs" />
+  </ItemGroup>
+</Project>

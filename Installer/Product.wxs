@@ -1,0 +1,105 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+  xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+  xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <Package
+    Name="DesktopScroll"
+    Manufacturer="DesktopScroll"
+    Version="$(var.Version)"
+    UpgradeCode="{A45B6D6F-4F9A-4F9C-AF45-BF8B5A1E2A77}">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of DesktopScroll is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+    <Property Id="MSIRMSHUTDOWN" Value="2" />
+    <SetProperty
+      Id="WixQuietExecCmdLine"
+      Value="&quot;[%ComSpec]&quot; /c taskkill /IM DesktopScroll.exe /T /F"
+      Before="KillDesktopScrollPrecheck"
+      Sequence="execute" />
+
+    <CustomAction
+      Id="KillDesktopScrollPrecheck"
+      BinaryRef="Wix4UtilCA_$(sys.BUILDARCHSHORT)"
+      DllEntry="WixQuietExec"
+      Execute="immediate"
+      Return="ignore" />
+
+    <util:CloseApplication
+      Id="CloseDesktopScroll"
+      Target="DesktopScroll.exe"
+      Description="DesktopScroll"
+      CloseMessage="yes"
+      ElevatedCloseMessage="yes"
+      EndSessionMessage="yes"
+      ElevatedEndSessionMessage="yes"
+      Timeout="10"
+      RebootPrompt="no"
+      TerminateProcess="1" />
+
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="DesktopScroll is installed. You can launch it from the tray after setup completes." />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Start DesktopScroll now" />
+    <Property Id="WixUnelevatedShellExecTarget" Value="[#DesktopScrollExe]" />
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+
+    <UI>
+      <Publish
+        Dialog="ExitDialog"
+        Control="Finish"
+        Event="DoAction"
+        Value="LaunchDesktopScrollAfterInstall"
+        Order="1"
+        Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed" />
+    </UI>
+
+    <CustomAction
+      Id="LaunchDesktopScrollAfterInstall"
+      BinaryRef="Wix4UtilCA_$(sys.BUILDARCHSHORT)"
+      DllEntry="WixUnelevatedShellExec"
+      Execute="immediate"
+      Return="ignore" />
+
+    <Feature Id="MainFeature" Title="DesktopScroll" Level="1">
+      <ComponentGroupRef Id="DesktopScrollComponents" />
+      <ComponentGroupRef Id="DesktopScrollShortcutsComponents" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <InstallExecuteSequence>
+      <Custom Action="KillDesktopScrollPrecheck" Before="InstallValidate" />
+    </InstallExecuteSequence>
+  </Fragment>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="DesktopScroll" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="DesktopScrollProgramMenuDir" Name="DesktopScroll" />
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="DesktopScrollComponents" Directory="INSTALLFOLDER">
+      <Component Id="DesktopScrollExeComponent" Guid="{5B9F2E1A-9F82-4C0D-AE8C-7E13A4EC0D88}">
+        <File Id="DesktopScrollExe" Source="$(var.DesktopScrollPublishDir)DesktopScroll.exe" />
+        <File Source="$(var.DesktopScrollPublishDir)DesktopScroll.dll" />
+        <File Source="$(var.DesktopScrollPublishDir)appsettings.json" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="DesktopScrollShortcutsComponents" Directory="DesktopScrollProgramMenuDir">
+      <Component Id="DesktopScrollStartMenuShortcutComponent" Guid="{E2A562A4-1A8E-462B-B8AC-912CDE1F4D83}">
+        <Shortcut
+          Id="DesktopScrollStartMenuShortcut"
+          Name="DesktopScroll"
+          Description="Launch DesktopScroll"
+          Target="[INSTALLFOLDER]DesktopScroll.exe"
+          WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveDesktopScrollProgramMenuDir" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\DesktopScroll" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
