@@ -227,7 +227,7 @@ public sealed class TrayApplicationContext : ApplicationContext
 
         if (HasNonShiftSystemModifierPressed())
         {
-            return false;
+            return true;
         }
 
         if (TryMapToScrollDirection(key, out var directionKey))
@@ -245,7 +245,7 @@ public sealed class TrayApplicationContext : ApplicationContext
             return true;
         }
 
-        return false;
+        return true;
     }
 
     private bool HandleHotkeysFromHook(Keys key)
@@ -274,7 +274,7 @@ public sealed class TrayApplicationContext : ApplicationContext
 
         if (HasNonShiftSystemModifierPressed())
         {
-            return false;
+            return true;
         }
 
         if (TryMapToScrollDirection(key, out var directionKey))
@@ -288,7 +288,7 @@ public sealed class TrayApplicationContext : ApplicationContext
             return true;
         }
 
-        return false;
+        return true;
     }
 
     private void ExecuteScrollKey(Keys directionKey)
