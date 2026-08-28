@@ -272,6 +272,11 @@ public sealed class TrayApplicationContext : ApplicationContext
             return false;
         }
 
+        if (IsSystemModifierKey(key))
+        {
+            return false;
+        }
+
         if (HasNonShiftSystemModifierPressed())
         {
             return true;
@@ -488,6 +493,14 @@ public sealed class TrayApplicationContext : ApplicationContext
         }
 
         return key is >= Keys.A and <= Keys.Z;
+    }
+
+    private static bool IsSystemModifierKey(Keys key)
+    {
+        return key is Keys.ControlKey or Keys.LControlKey or Keys.RControlKey
+            or Keys.ShiftKey or Keys.LShiftKey or Keys.RShiftKey
+            or Keys.Menu or Keys.LMenu or Keys.RMenu
+            or Keys.LWin or Keys.RWin;
     }
 
     private static Icon ResolveTrayIcon()
