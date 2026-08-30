@@ -3,6 +3,10 @@ namespace DesktopScroll;
 internal static class Program
 {
     private const string SingleInstanceMutexName = "DesktopScroll.SingleInstance";
+    private const string LaunchAfterSetupArgument = "--launch-after-setup";
+    private const string PostInstallStartupPromptArgument = "--post-install-startup-prompt";
+    private const string StartupDisableArgument = "--startup-disable";
+    private const string StartupEnableArgument = "--startup-enable";
 
     [STAThread]
     private static void Main(string[] args)
@@ -11,17 +15,23 @@ internal static class Program
         {
             ApplicationConfiguration.Initialize();
 
-            if (args.Contains("--startup-enable", StringComparer.OrdinalIgnoreCase))
+            if (args.Contains(StartupEnableArgument, StringComparer.OrdinalIgnoreCase))
             {
                 var startup = new Startup.StartupRegistrationManager();
                 startup.Enable();
                 return;
             }
 
-            if (args.Contains("--startup-disable", StringComparer.OrdinalIgnoreCase))
+            if (args.Contains(StartupDisableArgument, StringComparer.OrdinalIgnoreCase))
             {
                 var startup = new Startup.StartupRegistrationManager();
                 startup.Disable();
+                return;
+            }
+
+            if (args.Contains(PostInstallStartupPromptArgument, StringComparer.OrdinalIgnoreCase)
+                && !PromptForStartupRegistration())
+            {
                 return;
             }
 
@@ -43,6 +53,33 @@ internal static class Program
             WriteCrashLog(ex, args);
             throw;
         }
+    }
+
+    private static bool PromptForStartupRegistration()
+    {
+        var startupManager = new Startup.StartupRegistrationManager();
+        var settingsService = new SettingsService();
+        var settings = settingsService.Load();
+
+        var result = MessageBox.Show(
+            "Start DesktopScroll automatically when you sign in to Windows?",
+            "DesktopScroll Startup",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question,
+            MessageBoxDefaultButton.Button1);
+
+        settings.StartWithWindows = result == DialogResult.Yes;
+        if (settings.StartWithWindows)
+        {
+            startupManager.Enable();
+        }
+        else
+        {
+            startupManager.Disable();
+        }
+
+        settingsService.Save(settings);
+        return Environment.GetCommandLineArgs().Contains(LaunchAfterSetupArgument, StringComparer.OrdinalIgnoreCase);
     }
 
     private static void WriteCrashLog(Exception ex, string[] args)

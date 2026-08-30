@@ -128,7 +128,7 @@ The application also supports these command-line options:
 .\DesktopScroll.exe --startup-disable
 ```
 
-They enable or disable the Windows startup registration directly.
+They enable or disable the Windows startup registration directly. Disabling keeps DesktopScroll visible in Windows Startup Apps with its switch off.
 
 ## Project Layout
 

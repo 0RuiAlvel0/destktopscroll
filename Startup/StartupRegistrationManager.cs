@@ -6,16 +6,38 @@ namespace DesktopScroll.Startup;
 public sealed class StartupRegistrationManager
 {
     private const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
+    private const string StartupApprovedRunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run";
     private const string RunValueName = "DesktopScroll";
+    private static readonly byte[] StartupApprovedEnabled = [0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+    private static readonly byte[] StartupApprovedDisabled = [0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
 
     public bool IsEnabled()
     {
         using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: false);
         var value = key?.GetValue(RunValueName);
-        return value is string command && !string.IsNullOrWhiteSpace(command);
+        if (value is not string command || string.IsNullOrWhiteSpace(command))
+        {
+            return false;
+        }
+
+        using var approvedKey = Registry.CurrentUser.OpenSubKey(StartupApprovedRunKeyPath, writable: false);
+        var approval = approvedKey?.GetValue(RunValueName) as byte[];
+        return approval is not { Length: > 0 } || approval[0] != StartupApprovedDisabled[0];
     }
 
     public void Enable()
+    {
+        SetRunValue();
+        SetStartupApprovedValue(StartupApprovedEnabled);
+    }
+
+    public void Disable()
+    {
+        SetRunValue();
+        SetStartupApprovedValue(StartupApprovedDisabled);
+    }
+
+    private static void SetRunValue()
     {
         var command = BuildLauncherCommand();
         using var key = Registry.CurrentUser.CreateSubKey(RunKeyPath, writable: true)
@@ -23,10 +45,11 @@ public sealed class StartupRegistrationManager
         key.SetValue(RunValueName, command, RegistryValueKind.String);
     }
 
-    public void Disable()
+    private static void SetStartupApprovedValue(byte[] value)
     {
-        using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: true);
-        key?.DeleteValue(RunValueName, false);
+        using var key = Registry.CurrentUser.CreateSubKey(StartupApprovedRunKeyPath, writable: true)
+            ?? throw new InvalidOperationException("Could not open the StartupApproved registry key.");
+        key.SetValue(RunValueName, value, RegistryValueKind.Binary);
     }
 
     private static string BuildLauncherCommand()
