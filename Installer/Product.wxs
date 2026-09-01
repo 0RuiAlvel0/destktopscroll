@@ -42,32 +42,34 @@
       <Publish
         Dialog="ExitDialog"
         Control="Finish"
-        Property="WixQuietExecCmdLine"
-        Value="&quot;[%ComSpec]&quot; /c start &quot;&quot; &quot;[#DesktopScrollExe]&quot; --post-install-startup-prompt --launch-after-setup"
+        Event="DoAction"
+        Value="ConfigureDesktopScrollAfterInstallAndLaunch"
         Order="1"
         Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed" />
       <Publish
         Dialog="ExitDialog"
         Control="Finish"
-        Property="WixQuietExecCmdLine"
-        Value="&quot;[%ComSpec]&quot; /c start &quot;&quot; &quot;[#DesktopScrollExe]&quot; --post-install-startup-prompt"
-        Order="2"
-        Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX &lt;&gt; 1 AND NOT Installed" />
-      <Publish
-        Dialog="ExitDialog"
-        Control="Finish"
         Event="DoAction"
         Value="ConfigureDesktopScrollAfterInstall"
-        Order="3"
-        Condition="NOT Installed" />
+        Order="2"
+        Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX &lt;&gt; 1 AND NOT Installed" />
     </UI>
 
     <CustomAction
-      Id="ConfigureDesktopScrollAfterInstall"
-      BinaryRef="Wix4UtilCA_$(sys.BUILDARCHSHORT)"
-      DllEntry="WixQuietExec"
+      Id="ConfigureDesktopScrollAfterInstallAndLaunch"
+      FileRef="DesktopScrollExe"
+      ExeCommand="--post-install-startup-prompt --launch-after-setup"
       Execute="immediate"
-      Return="ignore" />
+      Return="asyncNoWait"
+      Impersonate="yes" />
+
+    <CustomAction
+      Id="ConfigureDesktopScrollAfterInstall"
+      FileRef="DesktopScrollExe"
+      ExeCommand="--post-install-startup-prompt"
+      Execute="immediate"
+      Return="asyncNoWait"
+      Impersonate="yes" />
 
     <Feature Id="MainFeature" Title="DesktopScroll" Level="1">
       <ComponentGroupRef Id="DesktopScrollComponents" />
