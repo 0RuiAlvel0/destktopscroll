@@ -58,31 +58,38 @@ public sealed class GlobalKeyboardHookService : IDisposable
 
     private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
     {
-        if (nCode >= 0)
+        try 
         {
-            var message = wParam.ToInt32();
-            var data = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
-            var key = (Keys)data.vkCode;
-            var handled = false;
+            if (nCode >= 0)
+            {
+                var message = wParam.ToInt32();
+                var data = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
+                var key = (Keys)data.vkCode;
+                var handled = false;
 
-            if ((data.flags & LLKHF_INJECTED) != 0)
-            {
-                return CallNextHookEx(_hookHandle, nCode, wParam, lParam);
-            }
+                if ((data.flags & LLKHF_INJECTED) != 0)
+                {
+                    return CallNextHookEx(_hookHandle, nCode, wParam, lParam);
+                }
 
-            if (message == WM_KEYDOWN || message == WM_SYSKEYDOWN)
-            {
-                handled = InvokeHandlers(KeyDown, key);
-            }
-            else if (message == WM_KEYUP || message == WM_SYSKEYUP)
-            {
-                handled = InvokeHandlers(KeyUp, key);
-            }
+                if (message == WM_KEYDOWN || message == WM_SYSKEYDOWN)
+                {
+                    handled = InvokeHandlers(KeyDown, key);
+                }
+                else if (message == WM_KEYUP || message == WM_SYSKEYUP)
+                {
+                    handled = InvokeHandlers(KeyUp, key);
+                }
 
-            if (handled)
-            {
-                return (IntPtr)1;
+                if (handled)
+                {
+                    return (IntPtr)1;
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            RuntimeTrace.Write($"Error in global keyboard hook: {ex}");
         }
 
         return CallNextHookEx(_hookHandle, nCode, wParam, lParam);
