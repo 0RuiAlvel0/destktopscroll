@@ -14,7 +14,6 @@ public sealed class TrayApplicationContext : ApplicationContext
     private readonly ScrollingService _scrollingService;
     private readonly HotkeyService _hotkeyService;
     private readonly GlobalKeyboardHookService _keyboardHook;
-    private readonly KeyBindingResolver _keyBindingResolver;
     private readonly Control _uiInvoker;
     private Settings _settings;
     private bool _registeredHotkeysAvailable;
@@ -40,7 +39,6 @@ public sealed class TrayApplicationContext : ApplicationContext
         _scrollingService = new ScrollingService(_stateMachine, _settingsService);
         _hotkeyService = new HotkeyService();
         _keyboardHook = new GlobalKeyboardHookService();
-        _keyBindingResolver = new KeyBindingResolver();
         _uiInvoker = new Control();
         _uiInvoker.CreateControl();
         _settings = _settingsService.Load();
@@ -85,14 +83,14 @@ public sealed class TrayApplicationContext : ApplicationContext
         _hotkeyService.UnregisterAll();
         _registeredHotkeysAvailable = false;
 
-        if (_keyBindingResolver.TryParseHotkey(_settings.Hotkeys.Activate, out var activateKey, out var activateModifiers))
+        if (KeyBindingResolver.TryParseHotkey(_settings.Hotkeys.Activate, out var activateKey, out var activateModifiers))
         {
             _activationKey = activateKey;
             _activationModifiers = activateModifiers;
             TryRegisterHotkey(activateKey, activateModifiers, EnterTargetSelectionMode);
         }
 
-        if (_keyBindingResolver.TryParseHotkey(_settings.Hotkeys.Resume, out var resumeKey, out var resumeModifiers))
+        if (KeyBindingResolver.TryParseHotkey(_settings.Hotkeys.Resume, out var resumeKey, out var resumeModifiers))
         {
             _resumeKey = resumeKey;
             _resumeModifiers = resumeModifiers;
@@ -433,7 +431,7 @@ public sealed class TrayApplicationContext : ApplicationContext
 
     private Keys ResolveOrDefault(string value, Keys fallback)
     {
-        return _keyBindingResolver.TryParseSingleKey(value, out var key) ? key : fallback;
+        return KeyBindingResolver.TryParseSingleKey(value, out var key) ? key : fallback;
     }
 
     private void PersistLastTarget(Point target)

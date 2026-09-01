@@ -6,13 +6,15 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <DefaultItemExcludes>$(DefaultItemExcludes);Installer\**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Installer\**;DesktopScroll.Tests\**</DefaultItemExcludes>
     <ApplicationIcon>Assets\DesktopTieLogo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Installer\**\*" />
     <Content Remove="Installer\**\*" />
+    <None Remove="DesktopScroll.Tests\**\*" />
+    <Content Remove="DesktopScroll.Tests\**\*" />
     <Content Include="Assets\DesktopTieLogo.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

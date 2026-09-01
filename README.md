@@ -51,6 +51,18 @@ Run the published application with:
 .\artifacts\publish\DesktopScroll.exe
 ```
 
+## Tests
+
+DesktopScroll includes a focused unit-test suite for deterministic application behavior that does not require a live desktop, global keyboard hooks, or simulated mouse input. The tests cover application mode transitions, hotkey and scroll-key parsing, grid-label generation and capacity limits, and settings defaults, persistence, recovery from invalid configuration files, cloning, and saved target coordinates.
+
+Run the tests from the repository root:
+
+```powershell
+dotnet test .\DesktopScroll.Tests\DesktopScroll.Tests.csproj -nologo
+```
+
+The test project targets Windows because the application and its keyboard types use Windows Forms.
+
 ## Default Keyboard Shortcuts
 
 | Shortcut or key | Action |

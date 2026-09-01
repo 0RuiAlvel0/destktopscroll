@@ -2,7 +2,7 @@ namespace DesktopScroll;
 
 public sealed class KeyBindingResolver
 {
-    public bool TryParseHotkey(string value, out Keys key, out HotkeyModifiers modifiers)
+    public static bool TryParseHotkey(string value, out Keys key, out HotkeyModifiers modifiers)
     {
         key = Keys.None;
         modifiers = HotkeyModifiers.None;
@@ -53,7 +53,7 @@ public sealed class KeyBindingResolver
         return key != Keys.None;
     }
 
-    public bool TryParseSingleKey(string value, out Keys key)
+    public static bool TryParseSingleKey(string value, out Keys key)
     {
         key = Keys.None;
         if (string.IsNullOrWhiteSpace(value))
