@@ -137,6 +137,8 @@ public sealed class TrayApplicationContext : ApplicationContext
 
     private bool HandleKeyboardHookKeyDown(Keys key)
     {
+        var isScrollMode = _stateMachine.CurrentMode == AppMode.ScrollMode;
+
         if (_stateMachine.CurrentMode == AppMode.ScrollMode
             && key != Keys.Escape
             && !HasNonShiftSystemModifierPressed()
@@ -155,11 +157,14 @@ public sealed class TrayApplicationContext : ApplicationContext
             return true;
         }
 
-        return RunOnUiThread(() => OnGlobalKeyDown(key));
+        var handled = RunOnUiThread(() => OnGlobalKeyDown(key));
+        return isScrollMode || handled;
     }
 
     private bool HandleKeyboardHookKeyUp(Keys key)
     {
+        var isScrollMode = _stateMachine.CurrentMode == AppMode.ScrollMode;
+
         if (_stateMachine.CurrentMode == AppMode.ScrollMode
             && !HasNonShiftSystemModifierPressed()
             && TryMapToScrollDirection(key, out var directionKey))
@@ -173,7 +178,8 @@ public sealed class TrayApplicationContext : ApplicationContext
             return true;
         }
 
-        return RunOnUiThread(() => OnGlobalKeyUp(key));
+        var handled = RunOnUiThread(() => OnGlobalKeyUp(key));
+        return isScrollMode || handled;
     }
 
     private bool OnGlobalKeyDown(Keys key)
