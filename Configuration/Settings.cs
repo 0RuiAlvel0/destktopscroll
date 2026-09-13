@@ -23,7 +23,7 @@ public sealed class Settings
 
 public sealed class HotkeySettings
 {
-    public string Activate { get; set; } = "Win+Enter";
+    public string Activate { get; set; } = "Ctrl+Shift+Enter";
 
     public string Resume { get; set; } = "Ctrl+Win+Enter";
 }

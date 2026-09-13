@@ -12,7 +12,7 @@ public sealed class SettingsServiceTests : IDisposable
         var settings = service.Load();
 
         Assert.True(settings.Enabled);
-        Assert.Equal("Win+Enter", settings.Hotkeys.Activate);
+        Assert.Equal("Ctrl+Shift+Enter", settings.Hotkeys.Activate);
         Assert.True(File.Exists(Path.Combine(_settingsDirectory, "settings.json")));
     }
 
@@ -53,7 +53,7 @@ public sealed class SettingsServiceTests : IDisposable
         var settings = service.Load();
 
         Assert.True(settings.Enabled);
-        Assert.Equal("Win+Enter", settings.Hotkeys.Activate);
+        Assert.Equal("Ctrl+Shift+Enter", settings.Hotkeys.Activate);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public sealed class SettingsServiceTests : IDisposable
         clone.Hotkeys.Activate = "Alt+Enter";
 
         Assert.Equal(8, source.Grid.Rows);
-        Assert.Equal("Win+Enter", source.Hotkeys.Activate);
+        Assert.Equal("Ctrl+Shift+Enter", source.Hotkeys.Activate);
     }
 
     [Fact]

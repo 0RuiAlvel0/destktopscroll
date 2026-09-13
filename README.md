@@ -7,7 +7,7 @@ DesktopScroll is a keyboard-driven Windows utility for scrolling at a chosen poi
 ## Quick Usage
 
 1. Start DesktopScroll. It runs in the notification area (system tray).
-2. Press `Win+Enter` to enter target-selection mode.
+2. Press `Ctrl+Shift+Enter` to enter target-selection mode.
 3. A labeled grid appears across your monitors. Type the letters shown in the area where you want to scroll.
 4. When the label is complete, DesktopScroll selects that point and enters scroll mode. The selected area is marked with a cursor dot when that option is enabled.
 5. Use the configured scroll keys to scroll at the selected point. The default keys are `W`, `A`, `S`, and `D`.
@@ -67,7 +67,7 @@ The test project targets Windows because the application and its keyboard types 
 
 | Shortcut or key | Action |
 |---|---|
-| `Win+Enter` | Open the labeled screen grid and select a target point |
+| `Ctrl+Shift+Enter` | Open the labeled screen grid and select a target point |
 | `Ctrl+Win+Enter` | Resume scroll mode at the last selected point |
 | `W` | Scroll up |
 | `S` | Scroll down |
@@ -101,7 +101,7 @@ Changes are saved to the application settings file and applied when you press **
 
 ### Hotkeys
 
-- **Activation Hotkey**: The global shortcut used to open the labeled target-selection grid. Default: `Win+Enter`.
+- **Activation Hotkey**: The global shortcut used to open the labeled target-selection grid. Default: `Ctrl+Shift+Enter`.
 - **Resume Hotkey**: The global shortcut used to resume scrolling at the last selected point. Default: `Ctrl+Win+Enter`.
 
 ### Scroll Keys

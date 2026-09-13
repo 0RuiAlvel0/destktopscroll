@@ -16,11 +16,12 @@ public sealed class TrayApplicationContext : ApplicationContext
     private readonly GlobalKeyboardHookService _keyboardHook;
     private readonly Control _uiInvoker;
     private Settings _settings;
-    private bool _registeredHotkeysAvailable;
+    private bool _activationHotkeyRegistered;
+    private bool _resumeHotkeyRegistered;
     private Keys _activationKey = Keys.Enter;
     private Keys _resumeKey = Keys.Enter;
-    private HotkeyModifiers _activationModifiers = HotkeyModifiers.Win;
-    private HotkeyModifiers _resumeModifiers = HotkeyModifiers.Win | HotkeyModifiers.Control;
+    private HotkeyModifiers _activationModifiers = HotkeyModifiers.Control | HotkeyModifiers.Shift;
+    private HotkeyModifiers _resumeModifiers = HotkeyModifiers.Control | HotkeyModifiers.Win;
     private Keys _scrollUpKey;
     private Keys _scrollDownKey;
     private Keys _scrollLeftKey;
@@ -81,20 +82,21 @@ public sealed class TrayApplicationContext : ApplicationContext
     private void RegisterHotkeys()
     {
         _hotkeyService.UnregisterAll();
-        _registeredHotkeysAvailable = false;
+        _activationHotkeyRegistered = false;
+        _resumeHotkeyRegistered = false;
 
         if (KeyBindingResolver.TryParseHotkey(_settings.Hotkeys.Activate, out var activateKey, out var activateModifiers))
         {
             _activationKey = activateKey;
             _activationModifiers = activateModifiers;
-            TryRegisterHotkey(activateKey, activateModifiers, EnterTargetSelectionMode);
+            _activationHotkeyRegistered = TryRegisterHotkey(activateKey, activateModifiers, EnterTargetSelectionMode);
         }
 
         if (KeyBindingResolver.TryParseHotkey(_settings.Hotkeys.Resume, out var resumeKey, out var resumeModifiers))
         {
             _resumeKey = resumeKey;
             _resumeModifiers = resumeModifiers;
-            TryRegisterHotkey(resumeKey, resumeModifiers, ResumeLastTarget);
+            _resumeHotkeyRegistered = TryRegisterHotkey(resumeKey, resumeModifiers, ResumeLastTarget);
         }
     }
 
@@ -178,7 +180,7 @@ public sealed class TrayApplicationContext : ApplicationContext
 
     private bool OnGlobalKeyDown(Keys key)
     {
-        if (!_registeredHotkeysAvailable && HandleHotkeysFromHook(key))
+        if (HandleHotkeysFromHook(key))
         {
             return true;
         }
@@ -248,13 +250,13 @@ public sealed class TrayApplicationContext : ApplicationContext
 
     private bool HandleHotkeysFromHook(Keys key)
     {
-        if (key == _resumeKey && MatchesModifiers(_resumeModifiers))
+        if (!_resumeHotkeyRegistered && key == _resumeKey && MatchesModifiers(_resumeModifiers))
         {
             ResumeLastTarget();
             return true;
         }
 
-        if (key == _activationKey && MatchesModifiers(_activationModifiers))
+        if (!_activationHotkeyRegistered && key == _activationKey && MatchesModifiers(_activationModifiers))
         {
             EnterTargetSelectionMode();
             return true;
@@ -512,16 +514,17 @@ public sealed class TrayApplicationContext : ApplicationContext
         return SystemIcons.Application;
     }
 
-    private void TryRegisterHotkey(Keys key, HotkeyModifiers modifiers, Action handler)
+    private bool TryRegisterHotkey(Keys key, HotkeyModifiers modifiers, Action handler)
     {
         try
         {
             _hotkeyService.RegisterHotkey(key, modifiers, handler);
-            _registeredHotkeysAvailable = true;
+            return true;
         }
         catch
         {
-            // fall back to hook-based detection when registration is blocked by OS-reserved combinations
+            RuntimeTrace.Write($"Hotkey registration failed; using keyboard-hook fallback. Key={key}, Modifiers={modifiers}");
+            return false;
         }
     }
 
